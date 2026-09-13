@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; font-family: Arial, sans-serif; background: #f3f4f6; color: #1f2937; }
+button, input, select, textarea { font: inherit; }
+button:disabled { cursor: not-allowed; opacity: .65; }
+
+/* Mobile navigation helpers */
+.mobile-menu-button { display: none; }
+.mobile-sidebar { display: none; }
+@media (max-width: 767px) {
+  .mobile-menu-button { display: inline-flex; }
+}
+
+/* Original attendance page, made fluid on small screens */
+.attendance-page { background:#f4f6f9; color:#333; min-height:100vh; }
+.attendance-page .main { padding:30px; max-width:1200px; margin:auto; }
+.attendance-page .header { background:white; padding:25px; border-radius:10px; margin-bottom:25px; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+.attendance-page .header h1 { margin:0 0 10px; color:#1f2937; }
+.attendance-page .header p { color:#666; margin:5px 0; }
+.attendance-page .back-btn { display:inline-block; text-decoration:none; background:#374151; color:white; padding:10px 16px; border-radius:6px; margin-bottom:20px; }
+.attendance-page .back-btn:hover { background:#1f2937; }
+.attendance-page .submit-btn { border:none; background:#2563eb; color:white; padding:13px 25px; border-radius:6px; cursor:pointer; font-size:15px; margin-top:20px; }
+.attendance-page .submit-btn:hover { background:#1d4ed8; }
+.attendance-page .submit-btn:disabled { background:#9ca3af; }
+.attendance-page .attendance-box,.attendance-history-page .section { background:white; border-radius:10px; padding:25px; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+.attendance-page .attendance-box h2,.attendance-history-page .section h2 { margin:0 0 20px; }
+.attendance-page .table-container,.attendance-history-page .table-container { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.attendance-page table,.attendance-history-page table { width:100%; border-collapse:collapse; min-width:650px; }
+.attendance-page th { background:#1f2937; color:white; padding:14px; text-align:left; }
+.attendance-page td { padding:14px; border-bottom:1px solid #ddd; }
+.attendance-page tr:hover,.attendance-history-page tr:hover { background:#f9fafb; }
+.status-buttons { display:flex; gap:8px; flex-wrap:wrap; }
+.status-btn { border:none; padding:8px 14px; border-radius:5px; cursor:pointer; background:#e5e7eb; color:#333; }
+.status-btn.present.active { background:#16a34a; color:white; }
+.status-btn.absent.active { background:#dc2626; color:white; }
+.summary { display:flex; gap:15px; margin-bottom:20px; flex-wrap:wrap; }
+.summary-card { background:#f9fafb; padding:15px 25px; border-radius:8px; border:1px solid #ddd; }
+.summary-card strong { font-size:20px; margin-left:5px; }
+.attendance-loading { text-align:center; padding:40px; color:#777; }
+.message { padding:15px; border-radius:6px; margin-bottom:20px; }
+.message.success { background:#dcfce7; color:#166534; }
+.message.error { background:#fee2e2; color:#991b1b; }
+.message.warning { background:#fef3c7; color:#92400e; }
+
+/* Attendance history / teacher styles retained from source, responsive */
+.attendance-history-page,.teacher-page { min-height:100vh; background:#f4f6f9; color:#333; }
+.history-sidebar,.teacher-sidebar { position:fixed; left:0; top:0; width:230px; height:100vh; background:#1f2937; color:white; padding:25px 15px; z-index:40; }
+.history-sidebar h2,.teacher-sidebar h2 { text-align:center; margin:0 0 35px; }
+.history-sidebar a,.teacher-sidebar a { display:block; color:white; text-decoration:none; padding:13px 15px; margin-bottom:8px; border-radius:6px; }
+.history-sidebar a:hover,.teacher-sidebar a:hover { background:#374151; }
+.history-sidebar a.active,.teacher-sidebar a.active { background:#2563eb; }
+.history-sidebar .logout,.teacher-sidebar .logout { margin-top:30px; background:#dc2626; text-align:center; }
+.attendance-history-page .main,.teacher-page .main { margin-left:230px; padding:30px; }
+.attendance-history-page .header,.teacher-page .header,.teacher-page .section,.teacher-page .card { background:white; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+.attendance-history-page .header,.teacher-page .header { padding:25px; margin-bottom:25px; }
+.attendance-history-page .header h1,.teacher-page .header h1 { margin:0 0 8px; }
+.attendance-history-page .header p,.teacher-page .header p { color:#666; }
+.attendance-history-page th { background:#1f2937; color:white; padding:14px; text-align:left; font-size:14px; }
+.attendance-history-page td { padding:14px; border-bottom:1px solid #e5e7eb; font-size:14px; }
+.present { color:#15803d; background:#dcfce7; padding:6px 10px; border-radius:20px; font-weight:bold; }
+.absent { color:#b91c1c; background:#fee2e2; padding:6px 10px; border-radius:20px; font-weight:bold; }
+.view-btn { border:none; background:#2563eb; color:white; padding:9px 14px; border-radius:6px; cursor:pointer; font-size:13px; }
+.empty { text-align:center; padding:50px 20px; color:#777; }
+.history-modal { position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,.55); padding:40px 20px; overflow-y:auto; }
+.history-modal-content { background:white; max-width:900px; margin:auto; border-radius:10px; padding:25px; position:relative; box-shadow:0 5px 20px rgba(0,0,0,.2); }
+.close-btn { position:absolute; right:20px; top:15px; border:none; background:#dc2626; color:white; width:35px; height:35px; border-radius:50%; cursor:pointer; font-size:20px; }
+.modal-title { margin-bottom:20px; padding-right:50px; }
+.modal-title h2 { color:#2563eb; margin:0 0 10px; }
+.lecture-details { background:#f3f4f6; padding:15px; border-radius:8px; margin-bottom:20px; display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.students-table { width:100%; border-collapse:collapse; min-width:520px; }
+.teacher-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:30px; }
+.teacher-page .card { padding:25px; }
+.teacher-page .card h3 { color:#666; font-size:15px; margin:0 0 10px; }
+.teacher-page .number { font-size:30px; font-weight:bold; color:#2563eb; }
+.teacher-page .section { padding:25px; }
+.teacher-lecture { border:1px solid #ddd; border-radius:8px; padding:20px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; gap:20px; }
+.teacher-lecture-info h3 { margin:0 0 8px; color:#2563eb; }
+.teacher-lecture-info p { margin:5px 0; color:#555; }
+.lecture-time { font-weight:bold; color:#111 !important; }
+.attendance-btn { border:none; background:#2563eb; color:white; padding:11px 18px; border-radius:6px; cursor:pointer; font-size:14px; white-space:nowrap; }
+
+@media (max-width: 767px) {
+  .attendance-page .main { padding:16px; }
+  .attendance-page .header,.attendance-page .attendance-box,.attendance-history-page .section { padding:18px; }
+  .attendance-page th,.attendance-page td { padding:10px; font-size:13px; }
+  .status-buttons { flex-direction:column; }
+  .status-btn { width:100%; }
+  .history-sidebar,.teacher-sidebar { display:none; }
+  .attendance-history-page .main,.teacher-page .main { margin-left:0; padding:16px; }
+  .lecture-details { grid-template-columns:1fr; }
+  .teacher-cards { grid-template-columns:1fr; gap:14px; }
+  .teacher-lecture { flex-direction:column; align-items:stretch; }
+  .attendance-btn { width:100%; }
+  .history-modal { padding:16px 8px; }
+  .history-modal-content { padding:20px 15px; }
+}

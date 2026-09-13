@@ -1,24 +1,38 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, request, jsonify, session, redirect, url_for, send_from_directory
 from flask_pymongo import PyMongo
 from flask_cors import CORS
 from dotenv import load_dotenv
 from functools import wraps
 import bcrypt
 import os
+from pathlib import Path
 from bson import ObjectId
 from bson.errors import InvalidId
-from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 
 # Load environment variables
 load_dotenv()
 
-app = Flask(__name__)
+BASE_DIR = Path(__file__).resolve().parent
+FRONTEND_DIST = BASE_DIR.parent / "frontend" / "dist"
+
+app = Flask(
+    __name__,
+    static_folder=str(FRONTEND_DIST / "assets"),
+    static_url_path="/assets"
+)
 
 # Secret key for sessions
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key-change-this")
 
 # Allow frontend/API requests
-CORS(app)
+CORS(
+    app,
+    supports_credentials=True,
+    origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ]
+)
 
 # MongoDB
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
@@ -43,8 +57,9 @@ def role_required(required_role):
 
             # Check role
             if session.get("role") != required_role:
-                return render_template(
-                    "unauthorized.html"
+                return send_from_directory(
+                    FRONTEND_DIST,
+                    "index.html"
                 ), 403
 
             return function(*args, **kwargs)
@@ -60,7 +75,10 @@ def role_required(required_role):
 
 @app.route("/")
 def login():
-    return render_template("login.html")
+    return send_from_directory(
+        FRONTEND_DIST,
+        "index.html"
+    )
 
 
 # ==========================================
@@ -141,6 +159,15 @@ def login_user():
 
 
 # ==========================================
+# REACT LOGIN ALIAS
+# ==========================================
+
+@app.route("/backend-login", methods=["POST"])
+def backend_login():
+    return login_user()
+
+
+# ==========================================
 # LOGOUT
 # ==========================================
 
@@ -160,8 +187,9 @@ def logout():
 @role_required("admin")
 def admin_dashboard():
 
-    return render_template(
-        "admin_dashboard.html"
+    return send_from_directory(
+        FRONTEND_DIST,
+        "index.html"
     )
 
 
@@ -173,8 +201,9 @@ def admin_dashboard():
 @role_required("teacher")
 def teacher_dashboard():
 
-    return render_template(
-        "teacher_dashboard.html"
+    return send_from_directory(
+        FRONTEND_DIST,
+        "index.html"
     )
 
 
@@ -186,8 +215,9 @@ def teacher_dashboard():
 @role_required("student")
 def student_dashboard():
 
-    return render_template(
-        "student_dashboard.html"
+    return send_from_directory(
+        FRONTEND_DIST,
+        "index.html"
     )
 
 
@@ -199,8 +229,9 @@ def student_dashboard():
 @role_required("parent")
 def parent_dashboard():
 
-    return render_template(
-        "parent_dashboard.html"
+    return send_from_directory(
+        FRONTEND_DIST,
+        "index.html"
     )
 
 
@@ -212,8 +243,9 @@ def parent_dashboard():
 @role_required("accountant")
 def accountant_dashboard():
 
-    return render_template(
-        "accountant_dashboard.html"
+    return send_from_directory(
+        FRONTEND_DIST,
+        "index.html"
     )
 
 
@@ -224,8 +256,9 @@ def accountant_dashboard():
 @app.route("/unauthorized")
 def unauthorized():
 
-    return render_template(
-        "unauthorized.html"
+    return send_from_directory(
+        FRONTEND_DIST,
+        "index.html"
     ), 403
 
 
@@ -428,7 +461,7 @@ def delete_student(student_id):
 @app.route("/students")
 @role_required("admin")
 def students():
-    return render_template("student.html")
+    return send_from_directory(FRONTEND_DIST, "index.html")
 
 # ================= UPDATE STUDENT =================
 
@@ -501,7 +534,7 @@ def update_student(student_id):
 @app.route("/timetable")
 @role_required("admin")
 def timetable_page():
-    return render_template("timetable.html")
+    return send_from_directory(FRONTEND_DIST, "index.html")
 
 
 # Get teachers for timetable dropdown
@@ -689,14 +722,15 @@ def attendance_page(lecture_id):
     # Teacher cannot access another teacher's lecture
     if not lecture:
 
-        return render_template(
-            "unauthorized.html"
+        return send_from_directory(
+            FRONTEND_DIST,
+            "index.html"
         ), 403
 
 
-    return render_template(
-        "attendance.html",
-        lecture_id=lecture_id
+    return send_from_directory(
+        FRONTEND_DIST,
+        "index.html"
     )
 
 
@@ -1052,7 +1086,7 @@ def save_attendance():
 @app.route("/attendance-history")
 @role_required("teacher")
 def attendance_history_page():
-    return render_template("attendance_history.html")
+    return send_from_directory(FRONTEND_DIST, "index.html")
 
 
 # =========================================================
@@ -1148,6 +1182,20 @@ def get_attendance_details(attendance_id):
 
 
     return jsonify(attendance), 200
+
+# ==========================================
+# REACT SPA FALLBACK
+# ==========================================
+
+@app.route("/<path:path>")
+def serve_react(path):
+    requested_path = FRONTEND_DIST / path
+
+    if requested_path.exists() and requested_path.is_file():
+        return send_from_directory(FRONTEND_DIST, path)
+
+    return send_from_directory(FRONTEND_DIST, "index.html")
+
 
 if __name__ == "__main__":
 
