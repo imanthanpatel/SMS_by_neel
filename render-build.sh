@@ -8,7 +8,6 @@ echo "=================================="
 
 pip install -r backend/requirement.txt
 
-
 echo "=================================="
 echo "Installing React dependencies..."
 echo "=================================="
