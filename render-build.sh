@@ -6,7 +6,7 @@ echo "=================================="
 echo "Installing Python dependencies..."
 echo "=================================="
 
-pip install -r backend/requirement.txt
+pip install -r backend/requirements.txt
 
 echo "=================================="
 echo "Installing React dependencies..."
